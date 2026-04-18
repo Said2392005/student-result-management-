@@ -1,0 +1,11 @@
+backend/node_modules
+backend/.env
+backend-aws/node_modules
+backend-aws/.env
+backend-aws/.serverless
+frontend/node_modules
+frontend/build
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+.DS_Store

@@ -1,0 +1,178 @@
+service: student-result-system
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+  stage: ${opt:stage, 'dev'}
+  memorySize: 256
+  timeout: 10
+  environment:
+    MONGO_URI: ${env:MONGO_URI}
+    JWT_SECRET: ${env:JWT_SECRET}
+    AWS_S3_BUCKET: ${self:custom.s3Bucket}
+    AWS_SES_EMAIL: ${env:SES_EMAIL}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "*"
+
+custom:
+  s3Bucket: student-result-photos-${self:provider.stage}
+  serverless-offline:
+    httpPort: 4000
+    noPrependStageInUrl: false
+
+plugins:
+  - serverless-offline
+
+functions:
+  # ── Auth ──────────────────────────────────────────────
+  login:
+    handler: functions/auth/login.handler
+    events:
+      - http:
+          path: auth/login
+          method: post
+          cors: true
+
+  register:
+    handler: functions/auth/register.handler
+    events:
+      - http:
+          path: auth/register
+          method: post
+          cors: true
+
+  # ── JWT Lambda Authorizer ─────────────────────────────
+  jwtAuthorizer:
+    handler: middleware/auth.handler
+
+  # ── Students ──────────────────────────────────────────
+  getStudents:
+    handler: functions/students/getStudents.handler
+    events:
+      - http:
+          path: students
+          method: get
+          cors: true
+          authorizer: jwtAuthorizer
+
+  addStudent:
+    handler: functions/students/addStudent.handler
+    events:
+      - http:
+          path: students
+          method: post
+          cors: true
+          authorizer: jwtAuthorizer
+
+  updateStudent:
+    handler: functions/students/updateStudent.handler
+    events:
+      - http:
+          path: students/{id}
+          method: put
+          cors: true
+          authorizer: jwtAuthorizer
+
+  deleteStudent:
+    handler: functions/students/deleteStudent.handler
+    events:
+      - http:
+          path: students/{id}
+          method: delete
+          cors: true
+          authorizer: jwtAuthorizer
+
+  # ── Results ───────────────────────────────────────────
+  getResults:
+    handler: functions/results/getResults.handler
+    events:
+      - http:
+          path: results
+          method: get
+          cors: true
+          authorizer: jwtAuthorizer
+
+  addResult:
+    handler: functions/results/addResult.handler
+    events:
+      - http:
+          path: results
+          method: post
+          cors: true
+          authorizer: jwtAuthorizer
+
+  updateResult:
+    handler: functions/results/updateResult.handler
+    events:
+      - http:
+          path: results/{id}
+          method: put
+          cors: true
+          authorizer: jwtAuthorizer
+
+  deleteResult:
+    handler: functions/results/deleteResult.handler
+    events:
+      - http:
+          path: results/{id}
+          method: delete
+          cors: true
+          authorizer: jwtAuthorizer
+
+  # ── Upload ────────────────────────────────────────────
+  uploadPhoto:
+    handler: functions/upload/uploadPhoto.handler
+    events:
+      - http:
+          path: upload/photo
+          method: post
+          cors: true
+          authorizer: jwtAuthorizer
+
+resources:
+  Resources:
+    StudentPhotosBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.s3Bucket}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ["*"]
+              AllowedMethods: [GET, PUT, POST, DELETE]
+              AllowedOrigins: ["*"]
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+    StudentPhotosBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref StudentPhotosBucket
+        PolicyDocument:
+          Statement:
+            - Effect: Allow
+              Principal: "*"
+              Action: s3:GetObject
+              Resource: !Sub "${StudentPhotosBucket.Arn}/*"

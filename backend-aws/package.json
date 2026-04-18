@@ -1,0 +1,24 @@
+{
+  "name": "student-result-backend-aws",
+  "version": "1.0.0",
+  "description": "Student Result Management System - AWS Serverless Backend",
+  "main": "handler.js",
+  "scripts": {
+    "dev": "serverless offline start --httpPort 4000 --stage dev",
+    "deploy": "serverless deploy --stage prod",
+    "deploy:dev": "serverless deploy --stage dev",
+    "logs": "serverless logs -f getStudents --tail"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1499.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.3.0",
+    "serverless-dotenv-plugin": "^6.0.0"
+  }
+}
