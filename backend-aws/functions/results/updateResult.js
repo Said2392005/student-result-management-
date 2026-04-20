@@ -4,6 +4,7 @@ const Result = require('../../models/Result');
 require('../../models/Student');
 
 module.exports.handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: require('../../utils/response').headers, body: '' };
   try {
     await connectDB();
 

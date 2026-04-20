@@ -40,6 +40,15 @@ custom:
   serverless-offline:
     httpPort: 4000
     noPrependStageInUrl: false
+  corsConfig:
+    origin: '*'
+    headers:
+      - Content-Type
+      - Authorization
+      - X-Amz-Date
+      - X-Api-Key
+      - X-Amz-Security-Token
+    allowCredentials: false
 
 plugins:
   - serverless-offline
@@ -52,7 +61,7 @@ functions:
       - http:
           path: auth/login
           method: post
-          cors: true
+          cors: ${self:custom.corsConfig}
 
   register:
     handler: functions/auth/register.handler
@@ -60,7 +69,7 @@ functions:
       - http:
           path: auth/register
           method: post
-          cors: true
+          cors: ${self:custom.corsConfig}
 
   # ── JWT Lambda Authorizer ─────────────────────────────
   jwtAuthorizer:
@@ -73,7 +82,7 @@ functions:
       - http:
           path: students
           method: get
-          cors: true
+          cors: ${self:custom.corsConfig}
           authorizer: jwtAuthorizer
 
   addStudent:
@@ -82,7 +91,7 @@ functions:
       - http:
           path: students
           method: post
-          cors: true
+          cors: ${self:custom.corsConfig}
           authorizer: jwtAuthorizer
 
   updateStudent:
@@ -91,7 +100,7 @@ functions:
       - http:
           path: students/{id}
           method: put
-          cors: true
+          cors: ${self:custom.corsConfig}
           authorizer: jwtAuthorizer
 
   deleteStudent:
@@ -100,7 +109,7 @@ functions:
       - http:
           path: students/{id}
           method: delete
-          cors: true
+          cors: ${self:custom.corsConfig}
           authorizer: jwtAuthorizer
 
   # ── Results ───────────────────────────────────────────
@@ -110,7 +119,7 @@ functions:
       - http:
           path: results
           method: get
-          cors: true
+          cors: ${self:custom.corsConfig}
           authorizer: jwtAuthorizer
 
   addResult:
@@ -119,7 +128,7 @@ functions:
       - http:
           path: results
           method: post
-          cors: true
+          cors: ${self:custom.corsConfig}
           authorizer: jwtAuthorizer
 
   updateResult:
@@ -128,7 +137,7 @@ functions:
       - http:
           path: results/{id}
           method: put
-          cors: true
+          cors: ${self:custom.corsConfig}
           authorizer: jwtAuthorizer
 
   deleteResult:
@@ -137,7 +146,7 @@ functions:
       - http:
           path: results/{id}
           method: delete
-          cors: true
+          cors: ${self:custom.corsConfig}
           authorizer: jwtAuthorizer
 
   # ── Upload ────────────────────────────────────────────
@@ -147,7 +156,7 @@ functions:
       - http:
           path: upload/photo
           method: post
-          cors: true
+          cors: ${self:custom.corsConfig}
           authorizer: jwtAuthorizer
 
 resources:

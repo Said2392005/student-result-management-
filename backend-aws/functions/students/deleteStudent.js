@@ -7,6 +7,7 @@ const AWS = require('aws-sdk');
 const s3 = new AWS.S3();
 
 module.exports.handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: require('../../utils/response').headers, body: '' };
   try {
     await connectDB();
 

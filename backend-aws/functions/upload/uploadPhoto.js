@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const s3 = new AWS.S3();
 
 module.exports.handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: require('../../utils/response').headers, body: '' };
   try {
     const { fileData, fileType, studentId } = JSON.parse(event.body || '{}');
 

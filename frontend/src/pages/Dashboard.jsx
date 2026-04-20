@@ -17,6 +17,51 @@ function StatCard({ title, value, icon, color, subtitle }) {
   );
 }
 
+const cloudServices = [
+  {
+    name: 'AWS Lambda',
+    subtitle: '12 Serverless Functions',
+    initial: 'λ',
+    bg: 'bg-orange-500',
+    url: 'https://ap-south-1.console.aws.amazon.com/lambda',
+  },
+  {
+    name: 'AWS API Gateway',
+    subtitle: '12 REST Endpoints',
+    initial: 'AG',
+    bg: 'bg-purple-500',
+    url: 'https://ap-south-1.console.aws.amazon.com/apigateway',
+  },
+  {
+    name: 'MongoDB Atlas',
+    subtitle: 'Cloud Database',
+    initial: 'M',
+    bg: 'bg-green-500',
+    url: 'https://cloud.mongodb.com',
+  },
+  {
+    name: 'AWS S3',
+    subtitle: 'Photo Storage',
+    initial: 'S3',
+    bg: 'bg-yellow-500',
+    url: 'https://s3.console.aws.amazon.com',
+  },
+  {
+    name: 'AWS CloudWatch',
+    subtitle: '12 Log Groups',
+    initial: 'CW',
+    bg: 'bg-blue-500',
+    url: 'https://ap-south-1.console.aws.amazon.com/cloudwatch',
+  },
+  {
+    name: 'Vercel CDN',
+    subtitle: 'Frontend Hosting',
+    initial: '▲',
+    bg: 'bg-gray-900',
+    url: 'https://vercel.com/dashboard',
+  },
+];
+
 function Dashboard() {
   const [stats, setStats] = useState({
     totalStudents: 0,
@@ -126,6 +171,39 @@ function Dashboard() {
                   </Link>
                 </div>
               ))}
+            </div>
+
+            {/* Cloud Infrastructure */}
+            <div className="mt-8">
+              <div className="mb-4">
+                <h3 className="text-lg font-bold text-gray-800">Cloud Infrastructure</h3>
+                <p className="text-gray-500 text-sm mt-0.5">AWS services powering this system</p>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {cloudServices.map((svc) => (
+                  <a
+                    key={svc.name}
+                    href={svc.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-white rounded-xl p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow border border-gray-100 group"
+                  >
+                    <div className={`${svc.bg} w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0`}>
+                      <span className="text-white text-sm font-bold">{svc.initial}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm truncate group-hover:text-indigo-600 transition-colors">
+                        {svc.name}
+                      </p>
+                      <p className="text-gray-400 text-xs truncate">{svc.subtitle}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                        <span className="text-green-600 text-xs font-medium">Active</span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
             </div>
           </>
         )}
