@@ -32,7 +32,6 @@ module.exports.handler = async (event) => {
         Key: key,
         Body: buffer,
         ContentType: fileType,
-        ACL: 'public-read',
       })
       .promise();
 

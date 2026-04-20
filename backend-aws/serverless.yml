@@ -183,6 +183,9 @@ resources:
             - AllowedHeaders: ["*"]
               AllowedMethods: [GET, PUT, POST, DELETE]
               AllowedOrigins: ["*"]
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: BucketOwnerEnforced
         PublicAccessBlockConfiguration:
           BlockPublicAcls: false
           BlockPublicPolicy: false
