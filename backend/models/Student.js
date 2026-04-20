@@ -24,6 +24,8 @@ const StudentSchema = new mongoose.Schema(
       min: 1,
       max: 5,
     },
+    email:    { type: String, trim: true },
+    photoUrl: { type: String },
   },
   { timestamps: true }
 );

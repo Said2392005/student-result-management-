@@ -3,6 +3,7 @@ const router = express.Router();
 const Student = require('../models/Student');
 const Result = require('../models/Result');
 const protect = require('../middleware/auth');
+const { v4: uuidv4 } = require('uuid');
 
 // GET /api/students
 router.get('/', protect, async (req, res) => {
@@ -80,6 +81,31 @@ router.delete('/:id', protect, async (req, res) => {
     if (!student) return res.status(404).json({ message: 'Student not found' });
     await Result.deleteMany({ student: req.params.id });
     res.json({ message: 'Student deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// POST /api/upload/photo  (base64 → stored as data URL for Express/dev)
+router.post('/upload/photo', protect, async (req, res) => {
+  try {
+    const { fileData, fileType, studentId } = req.body;
+    if (!fileData || !fileType) {
+      return res.status(400).json({ message: 'fileData and fileType are required' });
+    }
+    const allowed = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    if (!allowed.includes(fileType)) {
+      return res.status(400).json({ message: 'Only JPEG, PNG and WebP images are allowed' });
+    }
+    const base64 = fileData.replace(/^data:image\/\w+;base64,/, '');
+    if (Buffer.from(base64, 'base64').length > 2 * 1024 * 1024) {
+      return res.status(400).json({ message: 'File size must be under 2MB' });
+    }
+    const photoUrl = fileData;
+    if (studentId) {
+      await Student.findByIdAndUpdate(studentId, { photoUrl });
+    }
+    res.json({ photoUrl, key: `local/${uuidv4()}` });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

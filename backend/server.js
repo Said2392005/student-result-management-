@@ -28,6 +28,7 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/students', require('./routes/students'));
 app.use('/api/results', require('./routes/results'));
+app.use('/api/upload', require('./routes/students')); // photo upload reuses students router
 
 app.get('/', (req, res) => {
   res.json({ message: 'Student Result Management System API' });
