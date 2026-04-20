@@ -9,6 +9,19 @@ provider:
   stage: ${opt:stage, 'dev'}
   memorySize: 256
   timeout: 10
+  httpApi:
+    cors:
+      allowedOrigins:
+        - '*'
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
   environment:
     MONGO_URI: ${env:MONGO_URI}
     JWT_SECRET: ${env:JWT_SECRET}
@@ -61,7 +74,7 @@ functions:
       - http:
           path: auth/login
           method: post
-          cors: ${self:custom.corsConfig}
+          cors: true
 
   register:
     handler: functions/auth/register.handler
@@ -69,7 +82,7 @@ functions:
       - http:
           path: auth/register
           method: post
-          cors: ${self:custom.corsConfig}
+          cors: true
 
   # ── JWT Lambda Authorizer ─────────────────────────────
   jwtAuthorizer:
@@ -82,7 +95,7 @@ functions:
       - http:
           path: students
           method: get
-          cors: ${self:custom.corsConfig}
+          cors: true
           authorizer: jwtAuthorizer
 
   addStudent:
@@ -91,7 +104,7 @@ functions:
       - http:
           path: students
           method: post
-          cors: ${self:custom.corsConfig}
+          cors: true
           authorizer: jwtAuthorizer
 
   updateStudent:
@@ -100,7 +113,7 @@ functions:
       - http:
           path: students/{id}
           method: put
-          cors: ${self:custom.corsConfig}
+          cors: true
           authorizer: jwtAuthorizer
 
   deleteStudent:
@@ -109,7 +122,7 @@ functions:
       - http:
           path: students/{id}
           method: delete
-          cors: ${self:custom.corsConfig}
+          cors: true
           authorizer: jwtAuthorizer
 
   # ── Results ───────────────────────────────────────────
@@ -119,7 +132,7 @@ functions:
       - http:
           path: results
           method: get
-          cors: ${self:custom.corsConfig}
+          cors: true
           authorizer: jwtAuthorizer
 
   addResult:
@@ -128,7 +141,7 @@ functions:
       - http:
           path: results
           method: post
-          cors: ${self:custom.corsConfig}
+          cors: true
           authorizer: jwtAuthorizer
 
   updateResult:
@@ -137,7 +150,7 @@ functions:
       - http:
           path: results/{id}
           method: put
-          cors: ${self:custom.corsConfig}
+          cors: true
           authorizer: jwtAuthorizer
 
   deleteResult:
@@ -146,7 +159,7 @@ functions:
       - http:
           path: results/{id}
           method: delete
-          cors: ${self:custom.corsConfig}
+          cors: true
           authorizer: jwtAuthorizer
 
   # ── Upload ────────────────────────────────────────────
@@ -156,7 +169,7 @@ functions:
       - http:
           path: upload/photo
           method: post
-          cors: ${self:custom.corsConfig}
+          cors: true
           authorizer: jwtAuthorizer
 
 resources:

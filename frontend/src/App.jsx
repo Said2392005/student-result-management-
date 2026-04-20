@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Students from './pages/Students';
 import Results from './pages/Results';
+import Media from './pages/Media';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -37,6 +38,14 @@ function App() {
           element={
             <PrivateRoute>
               <Results />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/media"
+          element={
+            <PrivateRoute>
+              <Media />
             </PrivateRoute>
           }
         />

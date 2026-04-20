@@ -17,6 +17,7 @@ function Navbar() {
     { path: '/dashboard', label: 'Dashboard' },
     { path: '/students', label: 'Students' },
     { path: '/results', label: 'Results' },
+    { path: '/media', label: 'Media' },
   ];
 
   return (
