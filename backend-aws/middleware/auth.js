@@ -7,6 +7,10 @@ module.exports.handler = async (event) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    // Wildcard resource so the cached policy covers all endpoints,
+    // not just the one that triggered the first authorizer invocation.
+    const arnBase = event.methodArn.split('/').slice(0, 2).join('/');
+
     return {
       principalId: decoded.id,
       policyDocument: {
@@ -15,7 +19,7 @@ module.exports.handler = async (event) => {
           {
             Action: 'execute-api:Invoke',
             Effect: 'Allow',
-            Resource: event.methodArn,
+            Resource: `${arnBase}/*`,
           },
         ],
       },
