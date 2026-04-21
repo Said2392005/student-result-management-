@@ -12,7 +12,9 @@ provider:
   httpApi:
     cors:
       allowedOrigins:
-        - '*'
+        - https://student-result-management-go24.vercel.app
+        - http://localhost:3000
+        - http://localhost:4000
       allowedHeaders:
         - Content-Type
         - Authorization
@@ -27,6 +29,7 @@ provider:
     JWT_SECRET: ${env:JWT_SECRET}
     S3_BUCKET: ${self:custom.s3Bucket}
     SES_EMAIL: ${env:SES_EMAIL}
+    FRONTEND_URL: ${env:FRONTEND_URL}
   iam:
     role:
       statements:
