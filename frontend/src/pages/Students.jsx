@@ -108,15 +108,17 @@ function Students() {
     if (!photoFile) return null;
     setUploadingPhoto(true);
     try {
-      const reader = new FileReader();
-      const base64 = await new Promise((resolve) => {
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
         reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = reject;
         reader.readAsDataURL(photoFile);
       });
       const { data } = await API.post('/upload/photo', { fileData: base64, fileType: photoFile.type, studentId });
       return data.photoUrl;
     } catch (err) {
-      toast.error('Photo upload failed — student saved without photo');
+      console.error('Photo upload error:', err?.response?.data || err?.message || err);
+      toast.error(err?.response?.data?.message || 'Photo upload failed — student saved without photo');
       return null;
     } finally {
       setUploadingPhoto(false);
@@ -145,7 +147,7 @@ function Students() {
       if (photoFile) {
         const photoUrl = await uploadPhoto(savedStudent._id);
         if (photoUrl) {
-          await API.put(`/students/${savedStudent._id}`, { ...form, photoUrl });
+          await API.put(`/students/${savedStudent._id}`, { photoUrl });
         }
       }
 
