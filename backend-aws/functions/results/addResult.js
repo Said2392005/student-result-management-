@@ -24,7 +24,7 @@ const sendResultEmail = async (student, result) => {
 
   await ses
     .sendEmail({
-      Source: process.env.AWS_SES_EMAIL,
+      Source: process.env.SES_EMAIL,
       Destination: { ToAddresses: [student.email] },
       Message: {
         Subject: { Data: `Semester ${result.semester} Results — ${student.name}` },

@@ -28,14 +28,14 @@ module.exports.handler = async (event) => {
 
     await s3
       .putObject({
-        Bucket: process.env.AWS_S3_BUCKET,
+        Bucket: process.env.S3_BUCKET,
         Key: key,
         Body: buffer,
         ContentType: fileType,
       })
       .promise();
 
-    const photoUrl = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION || 'ap-south-1'}.amazonaws.com/${key}`;
+    const photoUrl = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION || 'ap-south-1'}.amazonaws.com/${key}`;
     return success({ photoUrl, key });
   } catch (err) {
     return error(err.message);

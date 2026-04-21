@@ -25,8 +25,8 @@ provider:
   environment:
     MONGO_URI: ${env:MONGO_URI}
     JWT_SECRET: ${env:JWT_SECRET}
-    AWS_S3_BUCKET: ${self:custom.s3Bucket}
-    AWS_SES_EMAIL: ${env:SES_EMAIL}
+    S3_BUCKET: ${self:custom.s3Bucket}
+    SES_EMAIL: ${env:SES_EMAIL}
   iam:
     role:
       statements:

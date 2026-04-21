@@ -18,7 +18,7 @@ module.exports.handler = async (event) => {
     if (student.photoUrl) {
       const key = student.photoUrl.split('.amazonaws.com/')[1];
       if (key) {
-        await s3.deleteObject({ Bucket: process.env.AWS_S3_BUCKET, Key: key }).promise();
+        await s3.deleteObject({ Bucket: process.env.S3_BUCKET, Key: key }).promise();
       }
     }
 
