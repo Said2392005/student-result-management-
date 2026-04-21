@@ -35,7 +35,10 @@ provider:
             - s3:PutObject
             - s3:GetObject
             - s3:DeleteObject
-          Resource: arn:aws:s3:::${self:custom.s3Bucket}/*
+            - s3:PutObjectAcl
+          Resource:
+            - arn:aws:s3:::${self:custom.s3Bucket}/*
+            - arn:aws:s3:::${self:custom.s3Bucket}
         - Effect: Allow
           Action:
             - ses:SendEmail
@@ -174,19 +177,20 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:custom.s3Bucket}
-        CorsConfiguration:
-          CorsRules:
-            - AllowedHeaders: ["*"]
-              AllowedMethods: [GET, PUT, POST, DELETE]
-              AllowedOrigins: ["*"]
         OwnershipControls:
           Rules:
-            - ObjectOwnership: BucketOwnerEnforced
+            - ObjectOwnership: ObjectWriter
         PublicAccessBlockConfiguration:
           BlockPublicAcls: false
           BlockPublicPolicy: false
           IgnorePublicAcls: false
           RestrictPublicBuckets: false
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ["*"]
+              AllowedMethods: [GET, PUT, POST, DELETE, HEAD]
+              AllowedOrigins: ["*"]
+              MaxAge: 3000
     StudentPhotosBucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:

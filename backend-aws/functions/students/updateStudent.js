@@ -10,10 +10,12 @@ module.exports.handler = async (event) => {
     const { id } = event.pathParameters;
     const body = JSON.parse(event.body || '{}');
 
-    const duplicate = await Student.findOne({ rollNo: body.rollNo, _id: { $ne: id } });
-    if (duplicate) return error('Roll number already in use', 400);
+    if (body.rollNo) {
+      const duplicate = await Student.findOne({ rollNo: body.rollNo, _id: { $ne: id } });
+      if (duplicate) return error('Roll number already in use', 400);
+    }
 
-    const student = await Student.findByIdAndUpdate(id, body, { new: true, runValidators: true });
+    const student = await Student.findByIdAndUpdate(id, body, { new: true, runValidators: false });
     if (!student) return error('Student not found', 404);
 
     return success(student);

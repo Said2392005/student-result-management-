@@ -1,43 +1,75 @@
-const { success, error } = require('../../utils/response');
 const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
 
-const s3 = new AWS.S3();
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Credentials': 'true',
+  'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token',
+  'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+  'Content-Type': 'application/json',
+};
 
 module.exports.handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: require('../../utils/response').headers, body: '' };
-  try {
-    const { fileData, fileType, studentId } = JSON.parse(event.body || '{}');
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
 
-    if (!fileData || !fileType) return error('fileData and fileType are required', 400);
+  try {
+    console.log('Upload event received, httpMethod:', event.httpMethod);
+    console.log('S3_BUCKET env:', process.env.S3_BUCKET);
+
+    const body = JSON.parse(event.body || '{}');
+    const { fileData, fileType, studentId } = body;
+
+    if (!fileData) {
+      return { statusCode: 400, headers, body: JSON.stringify({ message: 'No file data provided' }) };
+    }
 
     const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-    if (!allowedTypes.includes(fileType)) {
-      return error('Only JPEG, PNG and WebP images are allowed', 400);
+    if (fileType && !allowedTypes.includes(fileType)) {
+      return { statusCode: 400, headers, body: JSON.stringify({ message: 'Only JPEG, PNG and WebP allowed' }) };
     }
 
-    const base64 = fileData.replace(/^data:image\/\w+;base64,/, '');
-    const buffer = Buffer.from(base64, 'base64');
+    const base64Data = fileData.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
 
     if (buffer.length > 2 * 1024 * 1024) {
-      return error('File size must be under 2MB', 400);
+      return { statusCode: 400, headers, body: JSON.stringify({ message: 'File size must be under 2MB' }) };
     }
 
-    const ext = fileType.split('/')[1];
+    const ext = fileType ? fileType.split('/')[1] : 'jpg';
     const key = `photos/${studentId ? studentId + '_' : ''}${uuidv4()}.${ext}`;
 
-    await s3
-      .putObject({
-        Bucket: process.env.S3_BUCKET,
-        Key: key,
-        Body: buffer,
-        ContentType: fileType,
-      })
-      .promise();
+    const s3 = new AWS.S3({ region: process.env.AWS_REGION || 'ap-south-1' });
 
-    const photoUrl = `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION || 'ap-south-1'}.amazonaws.com/${key}`;
-    return success({ photoUrl, key });
+    console.log('Uploading to bucket:', process.env.S3_BUCKET, 'key:', key);
+
+    await s3.putObject({
+      Bucket: process.env.S3_BUCKET,
+      Key: key,
+      Body: buffer,
+      ContentType: fileType || 'image/jpeg',
+    }).promise();
+
+    const photoUrl = `https://${process.env.S3_BUCKET}.s3.ap-south-1.amazonaws.com/${key}`;
+    console.log('Upload success, photoUrl:', photoUrl);
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        photoUrl,
+        key,
+        bucket: process.env.S3_BUCKET,
+        message: 'Photo uploaded to S3 successfully',
+      }),
+    };
   } catch (err) {
-    return error(err.message);
+    console.error('Upload error:', err.message, err.code);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ message: 'Upload failed: ' + err.message, error: err.code }),
+    };
   }
 };

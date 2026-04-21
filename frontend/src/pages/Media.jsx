@@ -83,34 +83,38 @@ function Media() {
     handleFile(e.dataTransfer.files[0]);
   };
 
+  const fetchStudents = () =>
+    API.get('/students').then(({ data }) => setStudents(data)).catch(() => {});
+
   const handleUpload = async () => {
     if (!photoFile) { toast.error('Please select a photo first'); return; }
     setUploading(true);
     try {
-      const reader = new FileReader();
-      const base64 = await new Promise((resolve) => {
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
         reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = reject;
         reader.readAsDataURL(photoFile);
       });
-      const payload = { fileData: base64, fileType: photoFile.type };
-      if (selectedStudent) payload.studentId = selectedStudent;
 
-      const { data } = await API.post('/upload/photo', payload);
+      const { data } = await API.post('/upload/photo', {
+        fileData: base64,
+        fileType: photoFile.type,
+        studentId: selectedStudent || null,
+      });
 
-      if (selectedStudent) {
-        const student = students.find((s) => s._id === selectedStudent);
-        const form = student
-          ? { name: student.name, rollNo: student.rollNo, department: student.department, year: student.year, photoUrl: data.photoUrl }
-          : { photoUrl: data.photoUrl };
-        await API.put(`/students/${selectedStudent}`, form);
-        const updated = await API.get('/students');
-        setStudents(updated.data);
+      const { photoUrl } = data;
+      setUploadedUrl(photoUrl);
+
+      if (selectedStudent && photoUrl) {
+        await API.put(`/students/${selectedStudent}`, { photoUrl });
+        await fetchStudents();
       }
 
-      setUploadedUrl(data.photoUrl);
       toast.success('Photo uploaded to S3 successfully!');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Upload failed');
+      console.error('Upload error:', err);
+      toast.error(err.response?.data?.message || err.message || 'Upload failed');
     } finally {
       setUploading(false);
     }
