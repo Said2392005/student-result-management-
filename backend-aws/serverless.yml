@@ -53,15 +53,11 @@ custom:
   serverless-offline:
     httpPort: 4000
     noPrependStageInUrl: false
-  corsConfig:
-    origin: '*'
-    headers:
-      - Content-Type
-      - Authorization
-      - X-Amz-Date
-      - X-Api-Key
-      - X-Amz-Security-Token
-    allowCredentials: false
+  jwtAuth:
+    name: jwtAuthorizer
+    type: TOKEN
+    identitySource: method.request.header.Authorization
+    resultTtlInSeconds: 0
 
 plugins:
   - serverless-offline
@@ -96,7 +92,7 @@ functions:
           path: students
           method: get
           cors: true
-          authorizer: jwtAuthorizer
+          authorizer: ${self:custom.jwtAuth}
 
   addStudent:
     handler: functions/students/addStudent.handler
@@ -105,7 +101,7 @@ functions:
           path: students
           method: post
           cors: true
-          authorizer: jwtAuthorizer
+          authorizer: ${self:custom.jwtAuth}
 
   updateStudent:
     handler: functions/students/updateStudent.handler
@@ -114,7 +110,7 @@ functions:
           path: students/{id}
           method: put
           cors: true
-          authorizer: jwtAuthorizer
+          authorizer: ${self:custom.jwtAuth}
 
   deleteStudent:
     handler: functions/students/deleteStudent.handler
@@ -123,7 +119,7 @@ functions:
           path: students/{id}
           method: delete
           cors: true
-          authorizer: jwtAuthorizer
+          authorizer: ${self:custom.jwtAuth}
 
   # ── Results ───────────────────────────────────────────
   getResults:
@@ -133,7 +129,7 @@ functions:
           path: results
           method: get
           cors: true
-          authorizer: jwtAuthorizer
+          authorizer: ${self:custom.jwtAuth}
 
   addResult:
     handler: functions/results/addResult.handler
@@ -142,7 +138,7 @@ functions:
           path: results
           method: post
           cors: true
-          authorizer: jwtAuthorizer
+          authorizer: ${self:custom.jwtAuth}
 
   updateResult:
     handler: functions/results/updateResult.handler
@@ -151,7 +147,7 @@ functions:
           path: results/{id}
           method: put
           cors: true
-          authorizer: jwtAuthorizer
+          authorizer: ${self:custom.jwtAuth}
 
   deleteResult:
     handler: functions/results/deleteResult.handler
@@ -160,7 +156,7 @@ functions:
           path: results/{id}
           method: delete
           cors: true
-          authorizer: jwtAuthorizer
+          authorizer: ${self:custom.jwtAuth}
 
   # ── Upload ────────────────────────────────────────────
   uploadPhoto:
@@ -170,7 +166,7 @@ functions:
           path: upload/photo
           method: post
           cors: true
-          authorizer: jwtAuthorizer
+          authorizer: ${self:custom.jwtAuth}
 
 resources:
   Resources:
